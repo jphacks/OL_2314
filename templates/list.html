@@ -17,11 +17,12 @@
         {% else %}
         <a href="{% url 'like-home' item.pk %}" class="like-btn" tabindex="-1" role="button" aria-disabled="true"><i class="far fa-heart"></i></a>{{item.like.count}}
         {% endif %}
-
+        {% if request.user != item.user %} <!-- 自分の投稿にはフォローボタンを表示しない -->
         {% if item.user in connection.0.following.all %}
         <a href="{% url 'follow-home' item.pk %}" class="btn btn-danger ms-3" tabindex="-1" role="button" aria-disabled="true">フォロー解除</a>
         {% else %}
         <a href="{% url 'follow-home' item.pk %}" class="btn btn-primary ms-3" tabindex="-1" role="button" aria-disabled="true">フォロー</a>
+        {% endif %}
         {% endif %}
     </div>
     {% endfor %}

@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import Home, MyPost, CreatePost, DetailPost, UpdatePost, DeletePost, LikeHome, FollowHome, FollowDetail, FollowList, LikeDetail
-
+# app_name = 'snsapp'
 
 urlpatterns = [
     path('', Home.as_view(), name='home'),
