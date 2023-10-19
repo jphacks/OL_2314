@@ -42,7 +42,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'allauth.account.middleware.AccountMiddleware', 
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -122,16 +122,16 @@ MEDIA_ROOT = BASE_DIR / 'media'
 ###### ↓認証系の設定 #####
 AUTHENTICATION_BACKENDS = (
    'django.contrib.auth.backends.ModelBackend',
-   'allauth.account.auth_backends.AuthenticationBackend',  
+   'allauth.account.auth_backends.AuthenticationBackend',
 )
 
 ACCOUNT_AUTHENTICATION_METHOD = 'username'
-ACCOUNT_USERNAME_REQUIRED = True 
+ACCOUNT_USERNAME_REQUIRED = True
 
 ACCOUNT_EMAIL_VERIFICATION = 'none'
-ACCOUNT_EMAIL_REQUIRED = True 
+ACCOUNT_EMAIL_REQUIRED = True
 
-SITE_ID = 1 
+SITE_ID = 1
 
-LOGIN_REDIRECT_URL = 'home'          
-ACCOUNT_LOGOUT_REDIRECT_URL = '/accounts/logout/'
+LOGIN_REDIRECT_URL = 'home'
+ACCOUNT_LOGOUT_REDIRECT_URL = '/accounts/login/'
