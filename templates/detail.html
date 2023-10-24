@@ -18,10 +18,14 @@
         <a href="{% url 'like-detail' object.pk %}" class="like-btn" tabindex="-1" role="button" aria-disabled="true"><i class="far fa-heart"></i></a>{{object.like.count}}
         {% endif %}
 
+        {% if request.user != object.user %} <!- 自分の投稿にはフォローボタンを表示しない -->
+
         {% if object.user in connection.0.following.all %}
         <a href="{% url 'follow-detail' object.pk %}" class="btn btn-danger ms-3" tabindex="-1" role="button" aria-disabled="true">フォロー解除</a>
         {% else %}
         <a href="{% url 'follow-detail' object.pk %}" class="btn btn-primary ms-3" tabindex="-1" role="button" aria-disabled="true">フォロー</a>
+        {% endif %}
+
         {% endif %}
 
         {% if object.user == request.user %}
