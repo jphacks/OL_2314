@@ -19,7 +19,7 @@
         {% endif %}
 
         {% if request.user != object.user %} <!- 自分の投稿にはフォローボタンを表示しない -->
-
+        <a href="{% url 'comment-create' object.pk %}" class="btn btn-primary">コメントする</a>
         {% if object.user in connection.0.following.all %}
         <a href="{% url 'follow-detail' object.pk %}" class="btn btn-danger ms-3" tabindex="-1" role="button" aria-disabled="true">フォロー解除</a>
         {% else %}
@@ -34,4 +34,14 @@
         {% endif %}
     </div>
 </div>
-{% endblock content %}
+<div class="container">
+    <div class="alert alert-success" role="alert">
+        {% for comment in comments %} <!- コメントを表示 -->
+        <div class="comment">
+            <p>投稿者：{{ comment.user }}</p>
+            <p>コメント：{{ comment.content }}</p>
+        </div>
+        {% endfor %}
+        {% endblock content %}
+    </div>
+</div>

@@ -22,3 +22,15 @@ class Connection(models.Model):
 
     def __str__(self):
         return self.user.username
+
+class Comment(models.Model): #コメント機能
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments') #Postモデルに対して、1対多の関係を定義
+    user = models.ForeignKey(User, on_delete=models.CASCADE) #Userモデルに対して、1対多の関係を定義
+    content = models.TextField() #コメントの内容
+    created_at = models.DateTimeField(auto_now_add=True) #コメントの作成日時
+
+    def __str__(self): #データベースで表示されるもの
+        return self.content
+
+    class Meta: #データベースで表示されるもの
+        ordering = ["-created_at"]

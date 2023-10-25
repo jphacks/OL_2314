@@ -1,11 +1,11 @@
 from django.shortcuts import render, redirect
 from django.views import View
 from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import User
 
-from .models import Post, Connection
+from .models import Post, Connection, Comment
 
 
 class Home(LoginRequiredMixin, ListView):
@@ -48,14 +48,32 @@ class CreatePost(LoginRequiredMixin, CreateView):
 
 class DetailPost(LoginRequiredMixin, DetailView):
     """投稿詳細ページ"""
-    model = Post
-    template_name = 'detail.html'
+    model = Post #Postモデルを指定
+    template_name = 'detail.html' #テンプレートを指定
 
-    def get_context_data(self, *args, **kwargs):
-        context = super().get_context_data(*args, **kwargs)
-        context['connection'] = Connection.objects.get_or_create(user=self.request.user)
+    def get_context_data(self, *args, **kwargs): #コメント機能
+        context = super().get_context_data(*args, **kwargs) #親クラスのメソッドを呼び出す
+        context['connection'] = Connection.objects.get_or_create(user=self.request.user) #フォロー機能
+        context['comments'] = Comment.objects.filter(post=self.object) #コメントを取得
         return context
 
+class CommentCreate(LoginRequiredMixin, CreateView): #コメント機能
+    model = Comment
+    template_name = 'comment_form.html'
+    fields = ['content']
+
+    def get_context_data(self, **kwargs): 
+        context = super().get_context_data(**kwargs)
+        context['content'] = self.get_form()  # Add form to context
+        return context
+
+    def form_valid(self, form): 
+        form.instance.user = self.request.user
+        form.instance.post = Post.objects.get(pk=self.kwargs['pk'])
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse('detail', kwargs={'pk': self.object.post.pk})
 
 class UpdatePost(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     """投稿編集ページ"""
