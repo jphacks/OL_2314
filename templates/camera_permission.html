@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block customcss %}
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+{% endblock customcss %}
+<html>
+<body>
+
+<h1>Webカメラのテスト</h1>
+
+<video id="video" width="640" height="480" autoplay></video>
+<button id="snap">Snap Photo</button>
+<canvas id="canvas" width="640" height="480"></canvas>
+
+<script>
+// カメラ設定
+const constraints = {
+    audio: false,
+    video: {
+        width: 640, height: 480, facingMode: "user"
+    }
+};
+
+// videoタグとボタンを取得
+const video  = document.querySelector("#video");
+const btn_snap = document.querySelector("#snap");
+const canvas = document.querySelector("#canvas");
+
+// カメラを<video>と同期
+navigator.mediaDevices.getUserMedia(constraints)
+.then((stream) => {
+    video.srcObject = stream;
+});
+
+// ボタンにイベントを追加
+btn_snap.onclick = () => {
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+};
+</script>
+
+</body>
+</html>
