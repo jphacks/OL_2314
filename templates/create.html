@@ -6,4 +6,46 @@
     {{ form.as_p }}
     <input type="submit" value="投稿">
 </form>
+
+<script>
+    // カメラ設定
+    const constraints = {
+        audio: false,
+        video: {
+            width: 640, height: 480
+        }
+    };
+    
+    // video要素にWebカメラの映像を表示
+    const video = document.querySelector("#video");
+    
+    navigator.mediaDevices.getUserMedia(constraints)
+    .then((stream) => {
+        video.srcObject = stream;
+    });
+    
+    // ページの読み込みが完了したときの処理
+    window.onload = () => {
+        const canvas = document.querySelector("#canvas");
+        const context = canvas.getContext("2d");
+    
+        // 少し待ってから撮影する（カメラが起動するまでの時間）
+        setTimeout(() => {
+            // canvasにWebカメラの映像を描画
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    
+            // canvasの内容を画像データ（base64）に変換
+            const imageData = canvas.toDataURL("image/png");
+    
+            // 画像データをhiddenフィールドに設定
+            document.querySelector("#image").value = imageData;
+    
+            // フォームを送信
+            document.querySelector("#capture-form").submit();
+        }, 2000);  // ここでは2秒待つように設定しています
+    };
+    // window.onload = function() {
+    //     alert("JavaScriptが正常に動作しています！");
+    // };
+    </script>
 {% endblock content %}

@@ -3,9 +3,12 @@ from django.views import View
 from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView
 from django.urls import reverse_lazy, reverse
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.core.files.base import ContentFile
 from django.contrib.auth.models import User
 
 from .models import Post, Connection, Comment
+import base64
+from fer import FER
 
 
 class Home(LoginRequiredMixin, ListView):
@@ -44,6 +47,40 @@ class CreatePost(LoginRequiredMixin, CreateView):
         """投稿ユーザーをリクエストユーザーと紐付け"""
         form.instance.user = self.request.user
         return super().form_valid(form)
+
+def create(request):
+    if request.method == 'POST':
+        # POSTリクエストからbase64形式の画像データを取得
+        image_data = request.POST.get('image')
+
+        # ヘッダ部分を削除
+        format, imgstr = image_data.split(';base64,')
+        ext = format.split('/')[-1]
+
+        # base64形式のデータをバイナリデータに変換
+        data = ContentFile(base64.b64decode(imgstr), name='temp.' + ext)
+
+        def img2emo(img):
+            emotion_detector = FER()
+            return emotion_detector.top_emotion(img) # emotions = [angry, disgust, fear, happy, sad, surprise, neutral]
+        processed_image = img2emo(data)
+
+
+# def create(request):
+#     if request.method == 'POST':
+#         form = UploadImageForm(request.POST, request.FILES)
+#         if form.is_valid():
+#             # ここで画像を取得し、Pythonコードで処理します
+#             def img2emo(img):
+#                 emo_label = "fuck"
+#                 emo_score = 1
+#                 return emo_label, emo_score
+#             image = form.cleaned_data.get('image')
+#             processed_image = img2emo(image)  # あなたのPython関数を呼び出します
+#             # 処理した画像を保存または表示するコード...
+#     else:
+#         form = UploadImageForm()
+#     return render(request, 'create.html', {'form': form})
 
 
 class DetailPost(LoginRequiredMixin, DetailView):
