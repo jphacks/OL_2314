@@ -8,9 +8,14 @@
 {% block content %}
 <div class="container mt-3">
     {% for item in object_list %}
-    <div class="alert alert-success" role="alert">
-        <p>タイトル：<a href="{% url 'detail' item.pk %}">{{item.title}}</a></p>
-        <p>投稿者：{{item.user.username}}</p>    
+    <div class="alert alert-success emotion-{{ item.face_emotion }}" role="alert">
+        <p>
+            <a href="{% url 'detail' item.pk %}">{{item.content}}</a>
+            {% if item.face_emotion == "positive" %}🥰{% elif item.face_emotion == "negative" %}😥{% else %}😐{% endif %}
+        </p>
+        <p>投稿者：{{item.user.username}}</p>
+        <p>文字感情：{{item.text_emotion}}</p>
+        <p>表情：{{item.face_emotion}}</p>
 
         {% if request.user in item.like.all %}
         <a href="{% url 'like-home' item.pk %}" class="like-btn add-color" tabindex="-1" role="button" aria-disabled="true"><i class="fas fa-heart"></i></a>{{item.like.count}}
@@ -27,4 +32,16 @@
     </div>
     {% endfor %}
 </div>
+
+<style>
+    .alert.alert-success.emotion-positive{
+        background-color:palevioletred;
+    }
+    .alert.alert-success.emotion-negative{
+        background-color:lightblue;
+    }
+    .alert.alert-success.emotion-neutral{
+        background-color:lightgreen;
+    }
+</style>
 {% endblock content %}

@@ -7,3 +7,22 @@
     color:palevioletred;
 }
 
+#video {
+    display: none;
+}
+
+.alert.alert-success.emotion-negative{
+    margin: 0!important;
+    height: 200px!important;
+    background-color:rgb(200, 180, 225)!important;
+}
+.alert.alert-success.emotion-positive{
+    margin: 0!important;
+    height: 200px!important;
+    background-color:rgb(225, 180, 200)!important;
+}
+.alert.alert-success.emotion-neutral{
+    margin: 0!important;
+    height: 200px!important;
+    background-color:rgb(200, 225, 180)!important;
+}

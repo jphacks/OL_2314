@@ -1,51 +1,74 @@
 {% extends 'base.html' %}
 
-
 {% block content %}
-<form method="post">{% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" value="投稿">
-</form>
-
+<body>
+    <video id="video" width="640" height="480" autoplay></video>
+    <!-- hide canvas-->
+    <canvas id="canvas" autoplay></canvas>
+    <input type="text" id="textInput-content" value="content">
+    <input type="hidden" id="textInput-user_id" value="{{ request.user.id }}">
+    <button id="captureButton">キャプチャ</button>
+</body>
 <script>
-    // カメラ設定
-    const constraints = {
-        audio: false,
-        video: {
-            width: 640, height: 480
-        }
-    };
-    
-    // video要素にWebカメラの映像を表示
-    const video = document.querySelector("#video");
-    
-    navigator.mediaDevices.getUserMedia(constraints)
-    .then((stream) => {
-        video.srcObject = stream;
-    });
-    
-    // ページの読み込みが完了したときの処理
-    window.onload = () => {
-        const canvas = document.querySelector("#canvas");
-        const context = canvas.getContext("2d");
-    
-        // 少し待ってから撮影する（カメラが起動するまでの時間）
-        setTimeout(() => {
-            // canvasにWebカメラの映像を描画
-            context.drawImage(video, 0, 0, canvas.width, canvas.height);
-    
-            // canvasの内容を画像データ（base64）に変換
-            const imageData = canvas.toDataURL("image/png");
-    
-            // 画像データをhiddenフィールドに設定
-            document.querySelector("#image").value = imageData;
-    
-            // フォームを送信
-            document.querySelector("#capture-form").submit();
-        }, 2000);  // ここでは2秒待つように設定しています
-    };
-    // window.onload = function() {
-    //     alert("JavaScriptが正常に動作しています！");
-    // };
-    </script>
+var video = document.getElementById('video');
+// getUserMedia()でカメラ映像の取得
+var media = navigator.mediaDevices.getUserMedia({ video: true });
+//リアルタイム再生（ストリーミング）を行うためにビデオタグに流し込む
+media.then((stream) => {
+    video.srcObject = stream;
+});
+
+var canvas = document.getElementById('canvas');
+canvas.setAttribute('width', video.width);
+canvas.setAttribute('height', video.height);
+
+video.addEventListener(
+    'timeupdate',
+    function () {
+        var context = canvas.getContext('2d');
+        context.drawImage(video, 0, 0, video.width, video.height);
+    },
+    true
+);
+
+
+// キャプチャボタンを押したときの処理
+var captureButton = document.getElementById('captureButton');
+captureButton.addEventListener('click', function () {
+    var context = canvas.getContext('2d');
+    var img_base64 = canvas.toDataURL('image/jpeg');
+    console.log("img_base64: ", img_base64);
+    var content = document.getElementById('textInput-content').value;
+    var user_id = document.getElementById('textInput-user_id').value;
+    // var content = document.getElementById('textInput-content').value;
+    captureImg(img_base64, content, user_id);
+});
+
+
+var xhr = new XMLHttpRequest();
+
+// キャプチャ画像データ(base64)と文字列をPOST
+function captureImg(img_base64, content, user_id) {
+    const body = new FormData();
+    body.append('image', img_base64);
+    body.append('content', content);
+    // body.append('content', content); // 文字列を追加
+    body.append('user_id', user_id);
+
+    var url = "{% url 'face_emotion_predict' %}";
+    xhr.open('POST', url, true);
+    xhr.send(body);
+
+}
+
+</script>
+
+<style>
+    /* canvasは非表示にする
+    (これをしないと2枚画像が現れる) */
+    #canvas {
+        display: none;
+    }
+</style>
 {% endblock content %}
+

@@ -3,14 +3,15 @@ from django.contrib.auth.models import User
 
 # Create your models here.
 class Post(models.Model):
-    title = models.CharField(max_length=100)
     content = models.TextField()
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     like = models.ManyToManyField(User, related_name='related_post', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    face_emotion = models.CharField(max_length=20, blank=True, null=True)
+    text_emotion = models.CharField(max_length=20, blank=True, null=True)
 
     def __str__(self): #データベースで表示されるもの
-        return self.title
+        return self.content
 
     class Meta:
         ordering = ["-created_at"]

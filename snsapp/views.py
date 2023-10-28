@@ -1,14 +1,21 @@
 from django.shortcuts import render, redirect
+from django.http import HttpResponseRedirect
 from django.views import View
 from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView
 from django.urls import reverse_lazy, reverse
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.files.base import ContentFile
 from django.contrib.auth.models import User
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+from PIL import Image
+from io import BytesIO
 
 from .models import Post, Connection, Comment
 import base64
 from fer import FER
+import cv2
+import numpy as np
 
 
 class Home(LoginRequiredMixin, ListView):
@@ -40,7 +47,7 @@ class CreatePost(LoginRequiredMixin, CreateView):
     """投稿フォーム"""
     model = Post
     template_name = 'create.html'
-    fields = ['title', 'content']
+    fields = ['content']
     success_url = reverse_lazy('mypost')
 
     def form_valid(self, form):
@@ -48,39 +55,52 @@ class CreatePost(LoginRequiredMixin, CreateView):
         form.instance.user = self.request.user
         return super().form_valid(form)
 
-def create(request):
+@csrf_exempt
+def face_emotion_predict(request):
     if request.method == 'POST':
-        # POSTリクエストからbase64形式の画像データを取得
-        image_data = request.POST.get('image')
+        # bodyから画像データを取得
+        image = request.body
+        print(image)
+        # imageのタイプを確認
+        print(type(image))
+        # # データは 'data:image/jpeg;base64,' で始まるため、それを取り除きます
+        base64_data = str(image).split(',')[1]
 
-        # ヘッダ部分を削除
-        format, imgstr = image_data.split(';base64,')
-        ext = format.split('/')[-1]
+        # strのデータをバイトデータに変換します
+        byte_data = base64.b64decode(base64_data)
 
-        # base64形式のデータをバイナリデータに変換
-        data = ContentFile(base64.b64decode(imgstr), name='temp.' + ext)
+        # バイトデータをBytesIOオブジェクトに変換します
+        image_data = BytesIO(byte_data)
 
-        def img2emo(img):
+        # BytesIOオブジェクトをPIL Imageオブジェクトに変換します
+        img = Image.open(image_data)
+
+        # PIL Imageオブジェクトをnumpy配列に変換します
+        img_array = np.array(img)
+        def txt2emo(txt):# テキストから感情を推定
+            emotion_detector = None
+            return 0
+
+        def img2emo(img):# 画像から感情を推定
             emotion_detector = FER()
-            return emotion_detector.top_emotion(img) # emotions = [angry, disgust, fear, happy, sad, surprise, neutral]
-        processed_image = img2emo(data)
+            return emotion_detector.top_emotion(img) # emotions = [angry, disgust, fear, happy, sad, surprise, neutral] example:(happy, 0.98)
 
+        face_emotion, face_emotion_score = img2emo(img_array)
+        # 画像から推定した感情を取得し、Postモデルのface_emotionに保存
+        face_emotion_label = face_emotion
+        text_emotion_label = txt2emo(request.POST['content'])
 
-# def create(request):
-#     if request.method == 'POST':
-#         form = UploadImageForm(request.POST, request.FILES)
-#         if form.is_valid():
-#             # ここで画像を取得し、Pythonコードで処理します
-#             def img2emo(img):
-#                 emo_label = "fuck"
-#                 emo_score = 1
-#                 return emo_label, emo_score
-#             image = form.cleaned_data.get('image')
-#             processed_image = img2emo(image)  # あなたのPython関数を呼び出します
-#             # 処理した画像を保存または表示するコード...
-#     else:
-#         form = UploadImageForm()
-#     return render(request, 'create.html', {'form': form})
+        post = Post()
+        user = User.objects.get(id=request.POST['user_id'])
+        post.content = request.POST['content']
+
+        post.face_emotion = face_emotion_label
+        post.text_emotion = text_emotion_label
+        post.user = user
+        post.save()
+        #my-postにリダイレクトする
+        return HttpResponseRedirect(reverse('mypost/'))
+
 
 
 class DetailPost(LoginRequiredMixin, DetailView):
@@ -116,7 +136,7 @@ class UpdatePost(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     """投稿編集ページ"""
     model = Post
     template_name = 'update.html'
-    fields = ['title', 'content']
+    fields = ['content']
 
 
     def get_success_url(self,  **kwargs):
