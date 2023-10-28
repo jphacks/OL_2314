@@ -23,9 +23,9 @@ class Home(LoginRequiredMixin, ListView):
     model = Post
     template_name = 'list.html'
 
-    def get_queryset(self):
-        """リクエストユーザーのみ除外"""
-        return Post.objects.exclude(user=self.request.user)
+    # def get_queryset(self):
+    #     """リクエストユーザーのみ除外"""
+    #     return Post.objects.exclude(user=self.request.user)
     
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
@@ -77,6 +77,7 @@ def face_emotion_predict(request):
 
         # PIL Imageオブジェクトをnumpy配列に変換します
         img_array = np.array(img)
+        
         def txt2emo(txt):# テキストから感情を推定
             emotion_detector = None
             return 0
@@ -98,8 +99,8 @@ def face_emotion_predict(request):
         post.text_emotion = text_emotion_label
         post.user = user
         post.save()
-        #my-postにリダイレクトする
-        return HttpResponseRedirect(reverse('mypost/'))
+
+        return redirect('mypost')
 
 
 

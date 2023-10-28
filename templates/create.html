@@ -7,7 +7,7 @@
     <canvas id="canvas" autoplay></canvas>
     <input type="text" id="textInput-content" value="content">
     <input type="hidden" id="textInput-user_id" value="{{ request.user.id }}">
-    <button id="captureButton">キャプチャ</button>
+    <button id="captureButton">投稿</button>
 </body>
 <script>
 var video = document.getElementById('video');
@@ -35,6 +35,7 @@ video.addEventListener(
 // キャプチャボタンを押したときの処理
 var captureButton = document.getElementById('captureButton');
 captureButton.addEventListener('click', function () {
+    event.preventDefault(); 
     var context = canvas.getContext('2d');
     var img_base64 = canvas.toDataURL('image/jpeg');
     console.log("img_base64: ", img_base64);

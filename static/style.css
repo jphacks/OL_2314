@@ -26,3 +26,8 @@
     height: 200px!important;
     background-color:rgb(200, 225, 180)!important;
 }
+.alert.alert-success.emotion-None{
+    margin: 0!important;
+    height: 200px!important;
+    background-color:rgb(200, 200, 200)!important;
+}
