@@ -96,7 +96,7 @@ class DetailPost(LoginRequiredMixin, DetailView):
 
 class CommentCreate(LoginRequiredMixin, CreateView): #コメント機能
     model = Comment
-    template_name = 'comment_form.html'
+    template_name = 'create.html'
     fields = ['content']
 
     def get_context_data(self, **kwargs): 
