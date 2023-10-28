@@ -16,8 +16,88 @@ import base64
 from fer import FER
 import cv2
 import numpy as np
+from transformers import AutoTokenizer
+import torch
 
 
+def txt2emo(txt, is_nnp=True):# テキストから感情を推定
+    def _analyze_emotion(text, show_fig=False):
+        def _softmax(x):
+            f_x = np.exp(x) / np.sum(np.exp(x))
+            return f_x
+        # 推論モードを有効化
+        model.eval()
+        emotion_names = ['Joy', 'Sadness', 'Anticipation', 'Surprise', 'Anger', 'Fear', 'Disgust', 'Trust']
+        # 入力データ変換 + 推論
+        tokens = tokenizer(text, truncation=True, return_tensors="pt")
+        tokens.to(model.device)
+        preds = model(**tokens)
+        prob = _softmax(preds.logits.cpu().detach().numpy()[0])
+        out_dict = {n: p for n, p in zip(emotion_names, prob)}
+        max_prob = max(out_dict.values())
+        emotion_label = "".join([key for key, value in out_dict.items() if value == max_prob])
+        if is_nnp:
+            nnp_dict = {
+                None: "none",
+                "Neutral": "neutral",
+                "neutral": "neutral",
+                "sad": "negative",
+                "Joy": "positive",
+                "Sadness": "negative",
+                "Anticipation": "positive",
+                "Surprise": "positive",
+                "Anger": "negative",
+                "Fear": "negative",
+                "Disgust": "negative",
+                "Trust": "positive",
+                "Happy": "positive",
+                "happy": "positive",
+                "angry": "negative",
+                "disgust": "negative",
+                "fear": "negative",
+                "surprise": "positive",
+                "Surprise": "positive",
+            }
+            return nnp_dict[emotion_label], max_prob
+        return emotion_label, max_prob
+
+    checkpoint = 'cl-tohoku/bert-base-japanese-whole-word-masking'
+    tokenizer = AutoTokenizer.from_pretrained(checkpoint)
+    def _torch_load(file_name):
+        with open(file_name, 'rb') as f:
+            return torch.load(f, torch.device('cpu'))
+    model = _torch_load("static/model.pt")
+
+    text_emotion, text_emotion_score = _analyze_emotion(txt)
+    return text_emotion, text_emotion_score
+
+def img2emo(img, is_nnp=True):# 画像から感情を推定
+    emotion_detector = FER()
+    emotion_label, emotion_score = emotion_detector.top_emotion(img) # emotions = [angry, disgust, fear, happy, sad, surprise, neutral] example:(happy, 0.98)
+    if is_nnp:
+        nnp_dict = {
+                None: "none",
+                "neutral": "neutral",
+                "Neutral": "neutral",
+                "sad": "negative",
+                "Joy": "positive",
+                "Sadness": "negative",
+                "Anticipation": "positive",
+                "Surprise": "positive",
+                "Anger": "negative",
+                "Fear": "negative",
+                "Disgust": "negative",
+                "Trust": "positive",
+                "Happy": "positive",
+                "happy": "positive",
+                "angry": "negative",
+                "disgust": "negative",
+                "fear": "negative",
+                "surprise": "positive",
+                "Surprise": "positive",
+            }
+        return nnp_dict[emotion_label], emotion_score
+    return emotion_label, emotion_score
 class Home(LoginRequiredMixin, ListView):
     """HOMEページで、自分以外のユーザー投稿をリスト表示"""
     model = Post
@@ -77,19 +157,9 @@ def face_emotion_predict(request):
 
         # PIL Imageオブジェクトをnumpy配列に変換します
         img_array = np.array(img)
-        
-        def txt2emo(txt):# テキストから感情を推定
-            emotion_detector = None
-            return 0
 
-        def img2emo(img):# 画像から感情を推定
-            emotion_detector = FER()
-            return emotion_detector.top_emotion(img) # emotions = [angry, disgust, fear, happy, sad, surprise, neutral] example:(happy, 0.98)
-
-        face_emotion, face_emotion_score = img2emo(img_array)
-        # 画像から推定した感情を取得し、Postモデルのface_emotionに保存
-        face_emotion_label = face_emotion
-        text_emotion_label = txt2emo(request.POST['content'])
+        face_emotion_label, face_emotion_score = img2emo(img_array)
+        text_emotion_label, text_emotion_score = txt2emo(request.POST['content'])
 
         post = Post()
         user = User.objects.get(id=request.POST['user_id'])
@@ -120,7 +190,7 @@ class CommentCreate(LoginRequiredMixin, CreateView): #コメント機能
     template_name = 'create.html'
     fields = ['content']
 
-    def get_context_data(self, **kwargs): 
+    def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['content'] = self.get_form()  # Add form to context
         return context
@@ -132,6 +202,44 @@ class CommentCreate(LoginRequiredMixin, CreateView): #コメント機能
 
     def get_success_url(self):
         return reverse('detail', kwargs={'pk': self.object.post.pk})
+
+@csrf_exempt
+def face_emotion_predict_for_comment(request):
+    if request.method == 'POST':
+        # bodyから画像データを取得
+        image = request.body
+        print(image)
+        # imageのタイプを確認
+        print(type(image))
+        # # データは 'data:image/jpeg;base64,' で始まるため、それを取り除きます
+        base64_data = str(image).split(',')[1]
+
+        # strのデータをバイトデータに変換します
+        byte_data = base64.b64decode(base64_data)
+
+        # バイトデータをBytesIOオブジェクトに変換します
+        image_data = BytesIO(byte_data)
+
+        # BytesIOオブジェクトをPIL Imageオブジェクトに変換します
+        img = Image.open(image_data)
+
+        # PIL Imageオブジェクトをnumpy配列に変換します
+        img_array = np.array(img)
+
+        face_emotion_label, face_emotion_score = img2emo(img_array)
+        text_emotion_label, text_emotion_score = txt2emo(request.POST['content'])
+
+        comment = Comment()
+        user = User.objects.get(id=request.POST['user_id'])
+        pk = int(request.POST['path'].split('/')[-3])
+        comment.post = Post.objects.get(pk=int(pk))
+        comment.content = request.POST['content']
+        comment.face_emotion = face_emotion_label
+        comment.text_emotion = text_emotion_label
+        comment.user = user
+        comment.save()
+
+        return redirect('mypost')
 
 class UpdatePost(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     """投稿編集ページ"""

@@ -28,17 +28,19 @@
         {% endif %}
 
         {% if object.user == request.user %}
-        <a href="{% url 'update' object.pk %}" class="btn btn-primary ms-3" tabindex="-1" role="button" aria-disabled="true">編集</a>
         <a href="{% url 'delete' object.pk %}" class="btn btn-danger ms-3" tabindex="-1" role="button" aria-disabled="true">削除</a>
         {% endif %}
     </div>
 </div>
 <div class="container">
     <div class="alert alert-success" role="alert">
-        {% for comment in comments %} <!- コメントを表示 -->
+        {% for comment in comments %} <!-- コメントを表示 -->
         <div class="comment">
             <p>投稿者：{{ comment.user }}</p>
             <p>コメント：{{ comment.content }}</p>
+            {% if comment.face_emotion == "positive" %}🥰{% elif comment.face_emotion == "negative" %}😥{% else %}😐{% endif %}
+        <p>文字感情：{{comment.text_emotion}}</p>
+        <p>表情：{{comment.face_emotion}}</p>
         </div>
         {% endfor %}
         {% endblock content %}

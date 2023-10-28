@@ -2,3 +2,4 @@
 owner.txt
 /buckup/*
 /venv/*
+*.pt

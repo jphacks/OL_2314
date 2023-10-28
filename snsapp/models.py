@@ -29,6 +29,8 @@ class Comment(models.Model): #コメント機能
     user = models.ForeignKey(User, on_delete=models.CASCADE) #Userモデルに対して、1対多の関係を定義
     content = models.TextField() #コメントの内容
     created_at = models.DateTimeField(auto_now_add=True) #コメントの作成日時
+    face_emotion = models.CharField(max_length=20, blank=True, null=True)
+    text_emotion = models.CharField(max_length=20, blank=True, null=True)
 
     def __str__(self): #データベースで表示されるもの
         return self.content

@@ -17,4 +17,5 @@ urlpatterns = [
     path('follow-detail/<int:pk>', FollowDetail.as_view(), name='follow-detail'),
     path('follow-list/', FollowList.as_view(), name='follow-list'),
     path('face_emotion_predict/', views.face_emotion_predict, name='face_emotion_predict'),
+    path('face_emotion_predict_for_comment/', views.face_emotion_predict_for_comment, name='face_emotion_predict_for_comment'),
 ]

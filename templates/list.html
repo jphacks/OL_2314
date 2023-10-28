@@ -9,7 +9,7 @@
 <div class="container mt-3">
     {% for item in object_list %}
     <div class="alert alert-success emotion-{{ item.face_emotion }}" role="alert">
-        <p>{{item.content}}</p>
+        <a href="{% url 'detail' item.pk %}">{{item.content}}</a>
             {% if item.face_emotion == "positive" %}🥰{% elif item.face_emotion == "negative" %}😥{% else %}😐{% endif %}
         <p>投稿者：{{item.user.username}}</p>
         <p>文字感情：{{item.text_emotion}}</p>
@@ -31,15 +31,4 @@
     {% endfor %}
 </div>
 
-<style>
-    .alert.alert-success.emotion-positive{
-        background-color:palevioletred;
-    }
-    .alert.alert-success.emotion-negative{
-        background-color:lightblue;
-    }
-    .alert.alert-success.emotion-neutral{
-        background-color:lightgreen;
-    }
-</style>
 {% endblock content %}

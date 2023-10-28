@@ -48,6 +48,8 @@ captureButton.addEventListener('click', function () {
 
 var xhr = new XMLHttpRequest();
 
+var path = window.location.pathname;
+
 // キャプチャ画像データ(base64)と文字列をPOST
 function captureImg(img_base64, content, user_id) {
     const body = new FormData();
@@ -55,8 +57,13 @@ function captureImg(img_base64, content, user_id) {
     body.append('content', content);
     // body.append('content', content); // 文字列を追加
     body.append('user_id', user_id);
-
-    var url = "{% url 'face_emotion_predict' %}";
+    if (path.slice(-7) == "create/") {
+        var url = "{% url 'face_emotion_predict' %}";
+    } else {
+        body.append('path', path);
+        var url = "{% url 'face_emotion_predict_for_comment' %}";
+    }
+    
     xhr.open('POST', url, true);
     xhr.send(body);
 
