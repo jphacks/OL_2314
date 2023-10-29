@@ -1,14 +1,84 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<style>
+    #body_create {
+        font-family: Arial, sans-serif;
+        background-color: #f0f0f0;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        height: 100vh;
+    }
+    #video {
+        border: 1px solid black;
+    }
+    #canvas {
+        display: none;
+    }
+    #textInput-content {
+        display: block;
+        width: 80%;
+        height: 100px;
+        margin-top: 20px;
+        padding: 10px;
+        font-size: 16px;
+    }
+    #captureButton {
+        display: block;
+        margin-top: 20px;
+        padding: 10px 20px;
+        font-size: 20px;
+        color: white;
+        background-color: #007BFF;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+
+        /* Align the button to the right */
+        margin-left: auto; 
+    }
+    /* Wrap the textarea and button in a container */
+    .input-container {
+        width: 80%;
+        display: flex; 
+        flex-direction: column; 
+        align-items: flex-end;
+    }
+    #emoot {
+        width: 80%;
+        font-size: 100px;
+        font-weight: bold;
+        margin-top: 20px;
+        margin-bottom: 20px;
+        
+
+        
+    }
+</style>
+
 <body>
+<div id="body_create">
     <video id="video" width="640" height="480" autoplay></video>
     <!-- hide canvas-->
     <canvas id="canvas" autoplay></canvas>
-    <input type="text" id="textInput-content" value="content">
+
+    <!-- Wrap the textarea and button in a container -->
+    <div class="input-container">
+        <p id="emoot">Let's Emoot!</p>
+      <textarea id="textInput-content"></textarea>
+      <button id="captureButton">投稿</button>
+    </div>
+
     <input type="hidden" id="textInput-user_id" value="{{ request.user.id }}">
-    <button id="captureButton">投稿</button>
+</div>
 </body>
+
+
+
+
 <script>
 var video = document.getElementById('video');
 // getUserMedia()でカメラ映像の取得
@@ -35,13 +105,15 @@ video.addEventListener(
 // キャプチャボタンを押したときの処理
 var captureButton = document.getElementById('captureButton');
 captureButton.addEventListener('click', function () {
-    event.preventDefault(); 
+    // event.preventDefault();
     var context = canvas.getContext('2d');
     var img_base64 = canvas.toDataURL('image/jpeg');
     console.log("img_base64: ", img_base64);
     var content = document.getElementById('textInput-content').value;
     var user_id = document.getElementById('textInput-user_id').value;
-    captureImg(img_base64, content, user_id);
+    // var content = document.getElementById('textInput-content').value;
+    var redirect_url = captureImg(img_base64, content, user_id);
+    window.location.href = redirect_url;
 });
 
 
@@ -58,16 +130,17 @@ function captureImg(img_base64, content, user_id) {
     body.append('user_id', user_id);
     if (path.slice(-7) == "create/") {
         var url = "{% url 'face_emotion_predict' %}";
-        xhr.open('POST', url, true);
-        xhr.send(body);
-        window.location.href = "{% url 'mypost' %}";
     } else {
         body.append('path', path);
+        post_id = path.split("/")[2];
         var url = "{% url 'face_emotion_predict_for_comment' %}";
         xhr.open('POST', url, true);
         xhr.send(body);
-        window.location.href = "/detail/"+post_id;
+        return "/detail/"+post_id;
     }
+    xhr.open('POST', url, true);
+    xhr.send(body);
+    return "{% url 'mypost' %}";
 }
 
 </script>
@@ -80,4 +153,3 @@ function captureImg(img_base64, content, user_id) {
     }
 </style>
 {% endblock content %}
-

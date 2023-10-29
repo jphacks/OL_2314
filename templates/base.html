@@ -41,19 +41,17 @@
 
       <div id="sidebar">
         <div>
-          <input type="radio" id="option1" name="choice" value="Option 1" checked>
-          <label for="option1">Option 1</label>
+          <input type="radio" id="option1" name="emoot-choice" value="removed" checked>
+          <label for="option1">悪意のあるエモートを除外</label>
         </div>
         <div>
-          <input type="radio" id="option2" name="choice" value="Option 2">
-          <label for="option2">Option 2</label>
+          <input type="radio" id="option2" name="emoot-choice" value="all">
+          <label for="option2">すべてのエモートを表示</label>
         </div>
       </div>
 
-      <p id="output"></p>
       <script>
-      let radioButtons = document.getElementsByName('choice');
-      let output = document.getElementById('output');
+      let radioButtons = document.getElementsByName("emoot-choice");
 
       radioButtons.forEach((button) => {
         button.addEventListener('change', (event) => {
