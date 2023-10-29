@@ -1,39 +1,39 @@
 {% extends 'base.html' %}
 {% load static %}
-
 {% block customcss %}
     <link rel="stylesheet" href="{% static 'style.css' %}">
 {% endblock customcss %}
-
 {% block content %}
 <div class="container mt-3">
     {% for item in object_list %}
-    <div class="alert alert-success emotion-{{ item.face_emotion }}" role="alert">
-        投稿者：{{item.user.username}}
-        　文字感情：{% if item.face_emotion == "positive" %}🥰{% elif item.face_emotion == "negative" %}😥{% else %}😐{% endif %}
-            表情：{% if item.face_emotion == "positive" %}🥰{% elif item.face_emotion == "negative" %}😥{% elif item.face_emotion == "nautral" %}😐{% else %}🙃{% endif %}
-        　<a href="{% url 'detail' item.pk %}">投稿詳細</a></p>
-        <div class="main-emort-content">
-            {{item.content}}
-        </div>
-        <!-- 下に固定させる-->
-        <div class="fotter-emort-content">
-        コメント数：{{ item.comment_count }}　投稿日時：{{item.created_at}}
-        </div>
+        {% if item.face_emotion == item.text_emotion %}<!--感情一致なら実行-->
+        <div class="alert alert-success emotion-{{ item.face_emotion }}" role="alert">
+            投稿者：{{item.user.username}}
+            　文字感情：{% if item.text_emotion == "positive" %}🥰{% elif item.text_emotion == "negative" %}😥{% else %}😐{% endif %}
+                表情：{% if item.face_emotion == "positive" %}🥰{% elif item.face_emotion == "negative" %}😥{% elif item.face_emotion == "nautral" %}😐{% else %}🙃{% endif %}
+            　<a href="{% url 'detail' item.pk %}">投稿詳細</a></p>
+            <div class="main-emort-content">
+                {{item.content}}
+            </div>
+            <!-- 下に固定させる-->
+            <div class="fotter-emort-content">
+            コメント数：{{ item.comment_count }}　投稿日時：{{item.created_at}}
+            </div>
 
-        {% if request.user != item.user %} <!-- 自分の投稿にはフォローといいねボタンを表示しない -->
-        {% if request.user in item.like.all %}
-        <a href="{% url 'like-home' item.pk %}" class="like-btn add-color" tabindex="-1" role="button" aria-disabled="true"><i class="fas fa-heart"></i></a>{{item.like.count}}
-        {% else %}
-        <a href="{% url 'like-home' item.pk %}" class="like-btn" tabindex="-1" role="button" aria-disabled="true"><i class="far fa-heart"></i></a>{{item.like.count}}
+            {% if request.user != item.user %} <!-- 自分の投稿にはフォローといいねボタンを表示しない -->
+            {% if request.user in item.like.all %}
+            <a href="{% url 'like-home' item.pk %}" class="like-btn add-color" tabindex="-1" role="button" aria-disabled="true"><i class="fas fa-heart"></i></a>{{item.like.count}}
+            {% else %}
+            <a href="{% url 'like-home' item.pk %}" class="like-btn" tabindex="-1" role="button" aria-disabled="true"><i class="far fa-heart"></i></a>{{item.like.count}}
+            {% endif %}
+            {% if item.user in connection.0.following.all %}
+            <a href="{% url 'follow-home' item.pk %}" class="btn btn-danger ms-3" tabindex="-1" role="button" aria-disabled="true">フォロー解除</a>
+            {% else %}
+            <a href="{% url 'follow-home' item.pk %}" class="btn btn-primary ms-3" tabindex="-1" role="button" aria-disabled="true">フォロー</a>
+            {% endif %}
+            {% endif %}
+        </div>
         {% endif %}
-        {% if item.user in connection.0.following.all %}
-        <a href="{% url 'follow-home' item.pk %}" class="btn btn-danger ms-3" tabindex="-1" role="button" aria-disabled="true">フォロー解除</a>
-        {% else %}
-        <a href="{% url 'follow-home' item.pk %}" class="btn btn-primary ms-3" tabindex="-1" role="button" aria-disabled="true">フォロー</a>
-        {% endif %}
-        {% endif %}
-    </div>
     {% endfor %}
 </div>
 

@@ -42,7 +42,6 @@
 
 #sidebar {
     position: fixed;
-    /* left: 0; */
     right: 0;
     top: 0;
     height: 100%;
@@ -60,11 +59,28 @@
     margin-left: 20px;
     margin-right: 20px;
     margin-bottom: 20px;
-    /* font size */
 }
 
 .fotter-emort-content{
     position: absolute;
     bottom: 5%;
     font-size: 20px!important;
+}
+.commentowner {
+    height: 300px; /* あなたが望む高さに設定 */
+    /* コンテンツが高さを超える場合、自動的に高さを高く合わせる */
+    overflow: auto;
+}
+
+.action-buttons {
+    position: absolute;
+    bottom: 0;
+    padding-bottom: 1%;
+}
+.commentowner p {
+    font-size: 30px;
+}
+
+.commentblock {
+    padding-left: 10%;
 }

@@ -126,6 +126,15 @@
             localStorage.setItem('sidebarState', 'opened');
           }
         });
+
+        function handleOption1() {
+          // 悪意のあるエモートを除外するためのコード
+          akui_exit = true;
+        }
+        function handleOption2() {
+          // すべてのエモートを表示するためのコード
+          akui_exit = false;
+        }
       </script>
       {% block content %}
       {% endblock content %}
