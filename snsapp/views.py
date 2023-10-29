@@ -165,8 +165,7 @@ def face_emotion_predict(request):
         post.text_emotion = text_emotion_label
         post.user = user
         post.save()
-
-        return redirect('mypost')
+        return JsonResponse({'status': 200})
 
 
 
@@ -232,7 +231,7 @@ def face_emotion_predict_for_comment(request):
         comment.user = user
         comment.save()
 
-        return redirect('detail', pk)
+        return JsonResponse({'status': 200})
 
 class UpdatePost(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     """投稿編集ページ"""
