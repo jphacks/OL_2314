@@ -102,7 +102,6 @@ class Home(LoginRequiredMixin, ListView):
     """HOMEページで、自分以外のユーザー投稿をリスト表示"""
     model = Post
     template_name = 'list.html'
-
     # def get_queryset(self):
     #     """リクエストユーザーのみ除外"""
     #     return Post.objects.exclude(user=self.request.user)
@@ -140,9 +139,6 @@ def face_emotion_predict(request):
     if request.method == 'POST':
         # bodyから画像データを取得
         image = request.body
-        print(image)
-        # imageのタイプを確認
-        print(type(image))
         # # データは 'data:image/jpeg;base64,' で始まるため、それを取り除きます
         base64_data = str(image).split(',')[1]
 
@@ -208,9 +204,6 @@ def face_emotion_predict_for_comment(request):
     if request.method == 'POST':
         # bodyから画像データを取得
         image = request.body
-        print(image)
-        # imageのタイプを確認
-        print(type(image))
         # # データは 'data:image/jpeg;base64,' で始まるため、それを取り除きます
         base64_data = str(image).split(',')[1]
 
@@ -239,7 +232,7 @@ def face_emotion_predict_for_comment(request):
         comment.user = user
         comment.save()
 
-        return redirect('mypost')
+        return redirect('detail', pk)
 
 class UpdatePost(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     """投稿編集ページ"""

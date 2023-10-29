@@ -41,7 +41,6 @@ captureButton.addEventListener('click', function () {
     console.log("img_base64: ", img_base64);
     var content = document.getElementById('textInput-content').value;
     var user_id = document.getElementById('textInput-user_id').value;
-    // var content = document.getElementById('textInput-content').value;
     captureImg(img_base64, content, user_id);
 });
 
@@ -59,14 +58,16 @@ function captureImg(img_base64, content, user_id) {
     body.append('user_id', user_id);
     if (path.slice(-7) == "create/") {
         var url = "{% url 'face_emotion_predict' %}";
+        xhr.open('POST', url, true);
+        xhr.send(body);
+        window.location.href = "{% url 'mypost' %}";
     } else {
         body.append('path', path);
         var url = "{% url 'face_emotion_predict_for_comment' %}";
+        xhr.open('POST', url, true);
+        xhr.send(body);
+        window.location.href = "/detail/"+post_id;
     }
-    
-    xhr.open('POST', url, true);
-    xhr.send(body);
-
 }
 
 </script>

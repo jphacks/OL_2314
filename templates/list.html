@@ -9,12 +9,17 @@
 <div class="container mt-3">
     {% for item in object_list %}
     <div class="alert alert-success emotion-{{ item.face_emotion }}" role="alert">
-        <a href="{% url 'detail' item.pk %}">{{item.content}}</a>
-            {% if item.face_emotion == "positive" %}🥰{% elif item.face_emotion == "negative" %}😥{% else %}😐{% endif %}
-        <p>投稿者：{{item.user.username}}</p>
-        <p>文字感情：{{item.text_emotion}}</p>
-        <p>表情：{{item.face_emotion}}</p>
-        
+        投稿者：<a href="{% url 'detail' item.pk %}">{{item.user.username}}</a>
+        　文字感情：{% if item.face_emotion == "positive" %}🥰{% elif item.face_emotion == "negative" %}😥{% else %}😐{% endif %}
+            表情：{% if item.face_emotion == "positive" %}🥰{% elif item.face_emotion == "negative" %}😥{% elif item.face_emotion == "nautral" %}😐{% else %}🙃{% endif %}</p>
+        <div class="main-emort-content">
+            {{item.content}}
+        </div>
+        <!-- 下に固定させる-->
+        <div class="fotter-emort-content">
+        コメント数：{{ item.comment_count }}　投稿日時：{{item.created_at}}
+        </div>
+
         {% if request.user != item.user %} <!-- 自分の投稿にはフォローといいねボタンを表示しない -->
         {% if request.user in item.like.all %}
         <a href="{% url 'like-home' item.pk %}" class="like-btn add-color" tabindex="-1" role="button" aria-disabled="true"><i class="fas fa-heart"></i></a>{{item.like.count}}

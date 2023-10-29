@@ -13,6 +13,10 @@ class Post(models.Model):
     def __str__(self): #データベースで表示されるもの
         return self.content
 
+    @property
+    def comment_count(self):
+        return Comment.objects.filter(post=self).count()
+
     class Meta:
         ordering = ["-created_at"]
 
