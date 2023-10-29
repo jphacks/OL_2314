@@ -29,7 +29,14 @@
             <div class="navbar-nav">
               <a class="nav-link" href="{% url 'follow-list' %}">フォローユーザーの投稿</a>
               <a class="nav-link" href="/accounts/logout/">ログアウト</a>
+              <!-- urlの末尾がcreate/もしくはcomment/のとき非表示-->
+              {% if not request.path|slice:'-7:' in 'create/' and not request.path|slice:'-8:' in 'comment/' %}
               <a class="nav-link btn btn-success fixed-button" href="{% url 'create' %}" role="button">投稿</a>
+              {% endif %}
+              <!--homeにいる時に投稿ボタンを表示-->
+              {% if request.path == '/' %}
+              <a class="nav-link btn btn-success fixed-button" href="{% url 'create' %}" role="button">投稿</a>
+              {% endif %}
             </div>
           </div>
           <div>
@@ -41,6 +48,9 @@
 
       <div id="sidebar">
         <div>
+          <a class="nav-link" href="{% url 'mypost' %}">{{request.user.username}}</a>
+        </div>
+        <div>
           <input type="radio" id="option1" name="emoot-choice" value="removed" checked>
           <label for="option1">悪意のあるエモートを除外</label>
         </div>
@@ -50,6 +60,17 @@
         </div>
       </div>
 
+      <p id="output"></p>
+      <script>
+      let radioButtons = document.getElementsByName('choice');
+      let output = document.getElementById('output');
+
+      radioButtons.forEach((button) => {
+        button.addEventListener('change', (event) => {
+          // output.textContent = 'Changed value: ' + event.target.value;
+        });
+      });
+      </script>
       <style>
       body {
         margin-top: 150px;
@@ -79,9 +100,6 @@
       }
       .fixed-button {
         position: fixed;
-        /* size */
-        width: 120px;
-        height: 40px;
         right: 20px;
         bottom: 20px;
       }
@@ -90,11 +108,22 @@
         let sidebarToggle = document.getElementById('sidebar-toggle');
         let sidebar = document.getElementById('sidebar');
 
+        // // ページが読み込まれたときに、以前の状態をローカルストレージから取得します
+        // document.addEventListener('DOMContentLoaded', () => {
+        //   let sideberState = localStorage.getItem('sideberState');
+        //   if (sideberState === 'opened') {
+        //     sidebar.style.right = '0px';
+        //   } else {
+        //     sidebar.style.right = '-200px';
+        //   }
+        // });
+
         sidebarToggle.addEventListener('click', () => {
           if (sidebar.style.right === '0px') {
             sidebar.style.right = '-200px';
           } else {
             sidebar.style.right = '0px';
+            localStorage.setItem('sidebarState', 'opened');
           }
         });
       </script>

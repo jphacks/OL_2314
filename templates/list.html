@@ -9,9 +9,10 @@
 <div class="container mt-3">
     {% for item in object_list %}
     <div class="alert alert-success emotion-{{ item.face_emotion }}" role="alert">
-        投稿者：<a href="{% url 'detail' item.pk %}">{{item.user.username}}</a>
+        投稿者：{{item.user.username}}
         　文字感情：{% if item.face_emotion == "positive" %}🥰{% elif item.face_emotion == "negative" %}😥{% else %}😐{% endif %}
-            表情：{% if item.face_emotion == "positive" %}🥰{% elif item.face_emotion == "negative" %}😥{% elif item.face_emotion == "nautral" %}😐{% else %}🙃{% endif %}</p>
+            表情：{% if item.face_emotion == "positive" %}🥰{% elif item.face_emotion == "negative" %}😥{% elif item.face_emotion == "nautral" %}😐{% else %}🙃{% endif %}
+        　<a href="{% url 'detail' item.pk %}">投稿詳細</a></p>
         <div class="main-emort-content">
             {{item.content}}
         </div>

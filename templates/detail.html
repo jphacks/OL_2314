@@ -8,7 +8,7 @@
 {% block content %}
 <div class="container">
     <div class="alert alert-success" role="alert">
-        <p>投稿者：{{object.user}}</p>
+        <p>投稿者：{{object.user}}　コメント数：{{object.comment_count}}</p>
         <p>コメント：{{object.content}}</p>
 
         {% if request.user in object.like.all %}
@@ -17,7 +17,7 @@
         <a href="{% url 'like-detail' object.pk %}" class="like-btn" tabindex="-1" role="button" aria-disabled="true"><i class="far fa-heart"></i></a>{{object.like.count}}
         {% endif %}
 
-        {% if request.user != object.user %} <!- 自分の投稿にはフォローボタンを表示しない -->
+        {% if request.user != object.user %} <!-- 自分の投稿にはフォローボタンを表示しない -->
         <a href="{% url 'comment-create' object.pk %}" class="btn btn-primary">コメントする</a>
         {% if object.user in connection.0.following.all %}
         <a href="{% url 'follow-detail' object.pk %}" class="btn btn-danger ms-3" tabindex="-1" role="button" aria-disabled="true">フォロー解除</a>
@@ -33,16 +33,20 @@
     </div>
 </div>
 <div class="container">
-    <div class="alert alert-success" role="alert">
-        {% for comment in comments %} <!-- コメントを表示 -->
-        <div class="comment">
+    {% for comment in comments %}
+    <div class="alert alert-success alert alert-success emotion-{{ comment.face_emotion }}" role="alert">
+        <!-- コメントを表示 -->
+        <div class="comment ">
             <p>投稿者：{{ comment.user }}</p>
-            <p>コメント：{{ comment.content }}</p>
-            {% if comment.face_emotion == "positive" %}🥰{% elif comment.face_emotion == "negative" %}😥{% else %}😐{% endif %}
-        <p>文字感情：{{comment.text_emotion}}</p>
-        <p>表情：{{comment.face_emotion}}</p>
+            　文字感情：{% if comment.face_emotion == "positive" %}🥰{% elif comment.face_emotion == "negative" %}😥{% else %}😐{% endif %}
+                表情：{% if comment.face_emotion == "positive" %}🥰{% elif comment.face_emotion == "negative" %}😥{% elif comment.face_emotion == "nautral" %}😐{% else %}🙃{% endif %}</p>
+                <div class="main-emort-content">
+                    {{ comment.content }}
+                </div>
+
+
         </div>
-        {% endfor %}
-        {% endblock content %}
     </div>
+    {% endfor %}
 </div>
+{% endblock content %}
