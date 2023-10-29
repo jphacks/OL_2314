@@ -1,6 +1,6 @@
 # Emotter(えもったー)
 
-![IMAGE ALT TEXT HERE](./Emotter.png)
+![IMAGE ALT TEXT HERE](./assets/Emotter.png)
 
 ## 製品概要
 ### 背景 (製品開発のきっかけ、課題等)
@@ -8,6 +8,13 @@
 ### 製品説明（具体的な製品の説明）
 表情認識+自然言語感情認識を組み合わせた新感覚SNS。  
 表情と文章から検出された感情が一致しないコメントを悪意のある投稿（≒嘘）と定義し、その一致頻度とタイムラインの掲載頻度を紐づけることで正直者が多いSNSを作ることができる。  
+
+- タイムライン
+![IMAGE ALT TEXT HERE](./assets/Timeline.png)
+
+- エモート画面
+![IMAGE ALT TEXT HERE](./assets/Emoot.png)
+
 ### 特長
 #### 1. 感情解析
 - pythonの表情検出ライブラリであるFERと既存の学習済みモデルをファインチューニングしたモデルを用いた2段階感情検出。  
