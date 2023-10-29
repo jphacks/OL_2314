@@ -29,11 +29,11 @@
             <div class="navbar-nav">
               <a class="nav-link" href="{% url 'follow-list' %}">フォローユーザーの投稿</a>
               <a class="nav-link" href="/accounts/logout/">ログアウト</a>
-              <a class="nav-link btn btn-success" href="{% url 'create' %}" role="button">投稿</a>
+              <a class="nav-link btn btn-success fixed-button" href="{% url 'create' %}" role="button">投稿</a>
             </div>
           </div>
           <div>
-            <a class="nav-link" href="{% url 'mypost' %}">{{request.user.username}}</a>
+            <span id="sidebar-toggle">・・・</span>
           </div>
         </div>
       </nav>
@@ -50,15 +50,6 @@
         </div>
       </div>
 
-      <script>
-      let radioButtons = document.getElementsByName("emoot-choice");
-
-      radioButtons.forEach((button) => {
-        button.addEventListener('change', (event) => {
-          // output.textContent = 'Changed value: ' + event.target.value;
-        });
-      });
-      </script>
       <style>
       body {
         margin-top: 150px;
@@ -73,18 +64,40 @@
         z-index: 1;
       }
 
+      #sidebar .nav-link {
+        font-size: 20px;  /* ユーザー名のフォントサイズを大きくします */
+      }
+
       #sidebar {
         position: fixed;
-        right: 0;
-        top: 0;
-        height: 100%;
+        right: -200px;
+        top: 150px;  /* サイドバーの上端をヘッダーの下に移動します */
+        height: calc(100% - 150px);  /* サイドバーの高さを調整します */
         width: 200px;
         background-color: #a1d8e2;
-        margin-top: 150px;
+        transition: right 0.5s;
+      }
+      .fixed-button {
+        position: fixed;
+        /* size */
+        width: 120px;
+        height: 40px;
+        right: 20px;
+        bottom: 20px;
       }
       </style>
+      <script>
+        let sidebarToggle = document.getElementById('sidebar-toggle');
+        let sidebar = document.getElementById('sidebar');
 
-
+        sidebarToggle.addEventListener('click', () => {
+          if (sidebar.style.right === '0px') {
+            sidebar.style.right = '-200px';
+          } else {
+            sidebar.style.right = '0px';
+          }
+        });
+      </script>
       {% block content %}
       {% endblock content %}
       <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js" integrity="sha384-SR1sx49pcuLnqZUnnPwx6FCym0wLsk5JZuNx2bPPENzswTNFaQU1RDvt3wT4gWFG" crossorigin="anonymous"></script>
