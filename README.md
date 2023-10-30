@@ -17,6 +17,8 @@
 
 右のサイドバーのラジオボタンを切り替えることで、タイムライン上のエモート（投稿）についてフィルターをかけることができる。  
 
+- [デモ動画](https://youtu.be/YF6t8Mepq1A)
+
 - タイムライン
 ![IMAGE ALT TEXT HERE](./assets/Timeline.png)
 
