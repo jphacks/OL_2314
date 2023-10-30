@@ -7,35 +7,39 @@
 
 {% block content %}
 <div class="container">
-    <div class="alert alert-success" role="alert">
+    <div class="alert alert-success commentowner" role="alert">
         <p>投稿者：{{object.user}}　コメント数：{{object.comment_count}}</p>
         <p>コメント：{{object.content}}</p>
 
-        {% if request.user in object.like.all %}
-        <a href="{% url 'like-detail' object.pk %}" class="like-btn add-color" tabindex="-1" role="button" aria-disabled="true"><i class="fas fa-heart"></i></a>{{object.like.count}}
-        {% else %}
-        <a href="{% url 'like-detail' object.pk %}" class="like-btn" tabindex="-1" role="button" aria-disabled="true"><i class="far fa-heart"></i></a>{{object.like.count}}
-        {% endif %}
+        <div class="action-buttons">
+            {% if request.user in object.like.all %}
+            <a href="{% url 'like-detail' object.pk %}" class="like-btn add-color" tabindex="-1" role="button" aria-disabled="true"><i class="fas fa-heart"></i></a>{{object.like.count}}
+            {% else %}
+            <a href="{% url 'like-detail' object.pk %}" class="like-btn" tabindex="-1" role="button" aria-disabled="true"><i class="far fa-heart"></i></a>{{object.like.count}}
+            {% endif %}
 
-        {% if request.user != object.user %} <!-- 自分の投稿にはフォローボタンを表示しない -->
-        <a href="{% url 'comment-create' object.pk %}" class="btn btn-primary">コメントする</a>
-        {% if object.user in connection.0.following.all %}
-        <a href="{% url 'follow-detail' object.pk %}" class="btn btn-danger ms-3" tabindex="-1" role="button" aria-disabled="true">フォロー解除</a>
-        {% else %}
-        <a href="{% url 'follow-detail' object.pk %}" class="btn btn-primary ms-3" tabindex="-1" role="button" aria-disabled="true">フォロー</a>
-        {% endif %}
+            {% if request.user != object.user %} <!-- 自分の投稿にはフォローボタンを表示しない -->
+            <a href="{% url 'comment-create' object.pk %}" class="btn btn-primary">コメントする</a>
+            {% if object.user in connection.0.following.all %}
+            <a href="{% url 'follow-detail' object.pk %}" class="btn btn-danger ms-3" tabindex="-1" role="button" aria-disabled="true">フォロー解除</a>
+            {% else %}
+            <a href="{% url 'follow-detail' object.pk %}" class="btn btn-primary ms-3" tabindex="-1" role="button" aria-disabled="true">フォロー</a>
+            {% endif %}
 
-        {% endif %}
-
+            {% endif %}
+        </div>
+        <div class="fotter-emort-content">
+        コメント数：{{ object.comment_count }}　投稿日時：{{object.created_at}}
+        </div>
         {% if object.user == request.user %}
         <a href="{% url 'delete' object.pk %}" class="btn btn-danger ms-3" tabindex="-1" role="button" aria-disabled="true">削除</a>
         {% endif %}
     </div>
 </div>
-<div class="container">
+<div class="container commentblock">
     {% for comment in comments %}
     <div class="alert alert-success alert alert-success emotion-{{ comment.face_emotion }}" role="alert">
-        <!-- コメントを表示 -->
+         <!-- コメントを表示 -->
         <div class="comment ">
             <p>投稿者：{{ comment.user }}</p>
             　文字感情：{% if comment.face_emotion == "positive" %}🥰{% elif comment.face_emotion == "negative" %}😥{% else %}😐{% endif %}
@@ -43,8 +47,6 @@
                 <div class="main-emort-content">
                     {{ comment.content }}
                 </div>
-
-
         </div>
     </div>
     {% endfor %}

@@ -14,14 +14,13 @@ from io import BytesIO
 from .models import Post, Connection, Comment
 import base64
 from fer import FER
-import cv2
-import re
+from matplotlib import pyplot as plt
 import numpy as np
 from transformers import AutoTokenizer
 import torch
 
 
-def txt2emo(txt, is_nnp=True):# テキストから感情を推定
+def txt2emo(txt, is_nnp=True, debug=False):# テキストから感情を推定
     def _analyze_emotion(text, show_fig=False):
         def _softmax(x):
             f_x = np.exp(x) / np.sum(np.exp(x))
@@ -37,6 +36,8 @@ def txt2emo(txt, is_nnp=True):# テキストから感情を推定
         out_dict = {n: p for n, p in zip(emotion_names, prob)}
         max_prob = max(out_dict.values())
         emotion_label = "".join([key for key, value in out_dict.items() if value == max_prob])
+        if debug:
+            pass
         if is_nnp:
             nnp_dict = {
                 None: "none",
@@ -72,10 +73,13 @@ def txt2emo(txt, is_nnp=True):# テキストから感情を推定
     text_emotion, text_emotion_score = _analyze_emotion(txt)
     return text_emotion, text_emotion_score
 
-def img2emo(img, is_nnp=True):# 画像から感情を推定
+def img2emo(img, is_nnp=True, debug=False):# 画像から感情を推定
     emotion_detector = FER()
     emotion_label, emotion_score = emotion_detector.top_emotion(img)
-    cv2.imwrite("demo.png", img) # debug mode
+    if debug:# debug mode: 感情分析結果を保存
+        plt.imshow(img)
+        plt.title(f"{emotion_label}({emotion_score})")
+        plt.savefig("demo.png")
     if is_nnp:
         nnp_dict = {
                 None: "none",
@@ -166,8 +170,10 @@ def face_emotion_predict(request):
         # PIL Imageオブジェクトをnumpy配列に変換
         img_array = np.array(img)
 
-        face_emotion_label, face_emotion_score = img2emo(img_array)
-        text_emotion_label, text_emotion_score = txt2emo(request.POST['content'])
+        # face_emotion_label, face_emotion_score = img2emo(img_array)
+        face_emotion_label, face_emotion_score = img2emo(img_array, debug=True) # debug mode
+        # text_emotion_label, text_emotion_score = txt2emo(request.POST['content'])
+        text_emotion_label, text_emotion_score = txt2emo(request.POST['content'],debug=True) # debug mode
 
         post = Post()
         user = User.objects.get(id=request.POST['user_id'])
