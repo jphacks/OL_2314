@@ -63,6 +63,8 @@
 
 .fotter-emort-content{
     position: absolute;
+    right: 0;
+    margin-right: 20px;
     bottom: 5%;
     font-size: 20px!important;
 }
