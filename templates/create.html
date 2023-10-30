@@ -137,7 +137,7 @@ function captureImg(img_base64, content, user_id) {
             } else {
                 window.location.href = "{% url 'create' %}";
             }
-        }, 2000);
+        }, 4000);
     } else {
         body.append('path', path);
         post_id = path.split("/")[2];
@@ -151,7 +151,7 @@ function captureImg(img_base64, content, user_id) {
             } else {
                 window.location.href = "/comment/"+post_id;
             }
-        }, 2000);
+        }, 4000);
     }
 }
 

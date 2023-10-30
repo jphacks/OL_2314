@@ -15,6 +15,7 @@ from .models import Post, Connection, Comment
 import base64
 from fer import FER
 from matplotlib import pyplot as plt
+import japanize_matplotlib
 import numpy as np
 from transformers import AutoTokenizer
 import torch
@@ -37,7 +38,10 @@ def txt2emo(txt, is_nnp=True, debug=False):# テキストから感情を推定
         max_prob = max(out_dict.values())
         emotion_label = "".join([key for key, value in out_dict.items() if value == max_prob])
         if debug:
-            pass
+            plt.bar(emotion_names, prob)
+            plt.title(txt)
+            plt.savefig("debug_results/text_emotion.png")
+            plt.close()
         if is_nnp:
             nnp_dict = {
                 None: "none",
@@ -79,7 +83,8 @@ def img2emo(img, is_nnp=True, debug=False):# 画像から感情を推定
     if debug:# debug mode: 感情分析結果を保存
         plt.imshow(img)
         plt.title(f"{emotion_label}({emotion_score})")
-        plt.savefig("demo.png")
+        plt.savefig("debug_results/face_emotion.png")
+        plt.close()
     if is_nnp:
         nnp_dict = {
                 None: "none",
