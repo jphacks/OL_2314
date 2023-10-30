@@ -15,6 +15,7 @@ from .models import Post, Connection, Comment
 import base64
 from fer import FER
 import cv2
+import re
 import numpy as np
 from transformers import AutoTokenizer
 import torch
@@ -73,7 +74,8 @@ def txt2emo(txt, is_nnp=True):# テキストから感情を推定
 
 def img2emo(img, is_nnp=True):# 画像から感情を推定
     emotion_detector = FER()
-    emotion_label, emotion_score = emotion_detector.top_emotion(img) # emotions = [angry, disgust, fear, happy, sad, surprise, neutral] example:(happy, 0.98)
+    emotion_label, emotion_score = emotion_detector.top_emotion(img)
+    cv2.imwrite("demo.png", img) # debug mode
     if is_nnp:
         nnp_dict = {
                 None: "none",
@@ -97,7 +99,30 @@ def img2emo(img, is_nnp=True):# 画像から感情を推定
                 "Surprise": "positive",
             }
         return nnp_dict[emotion_label], emotion_score
-    return emotion_label, emotion_score
+    return emotion_label, emotion_score # emotions = [angry, disgust, fear, happy, sad, surprise, neutral] example:(happy, 0.98)
+
+def request2img(request):
+    # bodyから画像データを取得
+    # image = request.body
+    image = request.POST["image"]
+    # # データは 'data:image/jpeg;base64,' で始まるため、それを取り除きます
+    # method 1(implementing)
+    # escape_str = "img_base64:  data:image/jpeg;base64,"
+    # base64_data = str(image)[len(escape_str):]
+
+    # method 2
+    base64_data = str(image).split(',')[1]
+
+    # strのデータをバイトデータに変換します
+    byte_data = base64.b64decode(base64_data)
+
+    # バイトデータをBytesIOオブジェクトに変換します
+    image_data = BytesIO(byte_data)
+
+    # BytesIOオブジェクトをPIL Imageオブジェクトに変換します
+    img = Image.open(image_data)
+    return img
+
 class Home(LoginRequiredMixin, ListView):
     """HOMEページで、自分以外のユーザー投稿をリスト表示"""
     model = Post
@@ -137,21 +162,8 @@ class CreatePost(LoginRequiredMixin, CreateView):
 @csrf_exempt
 def face_emotion_predict(request):
     if request.method == 'POST':
-        # bodyから画像データを取得
-        image = request.body
-        # # データは 'data:image/jpeg;base64,' で始まるため、それを取り除きます
-        base64_data = str(image).split(',')[1]
-
-        # strのデータをバイトデータに変換します
-        byte_data = base64.b64decode(base64_data)
-
-        # バイトデータをBytesIOオブジェクトに変換します
-        image_data = BytesIO(byte_data)
-
-        # BytesIOオブジェクトをPIL Imageオブジェクトに変換します
-        img = Image.open(image_data)
-
-        # PIL Imageオブジェクトをnumpy配列に変換します
+        img = request2img(request)
+        # PIL Imageオブジェクトをnumpy配列に変換
         img_array = np.array(img)
 
         face_emotion_label, face_emotion_score = img2emo(img_array)

@@ -112,13 +112,11 @@ captureButton.addEventListener('click', function () {
     var content = document.getElementById('textInput-content').value;
     var user_id = document.getElementById('textInput-user_id').value;
     // var content = document.getElementById('textInput-content').value;
-    var redirect_url = captureImg(img_base64, content, user_id);
-    window.location.href = redirect_url;
+    captureImg(img_base64, content, user_id);
 });
 
 
 var xhr = new XMLHttpRequest();
-
 var path = window.location.pathname;
 
 // キャプチャ画像データ(base64)と文字列をPOST
@@ -132,22 +130,28 @@ function captureImg(img_base64, content, user_id) {
         var url = "{% url 'face_emotion_predict' %}";
         xhr.open('POST', url, true);
         xhr.send(body);
-        if (xhr.status == 200) {
-            return "{% url 'mypost' %}";
-        } else {
-            return "{% url 'create' %}";
-        }
+        //　wait NLP Processing time(2s)
+        setTimeout(function(){
+            if (xhr.status == 200) {
+                window.location.href = "{% url 'mypost' %}";
+            } else {
+                window.location.href = "{% url 'create' %}";
+            }
+        }, 2000);
     } else {
         body.append('path', path);
         post_id = path.split("/")[2];
         var url = "{% url 'face_emotion_predict_for_comment' %}";
         xhr.open('POST', url, true);
         xhr.send(body);
-        if (xhr.status == 200) {
-            return "/detail/"+post_id;
-        } else {
-            return "/comment/"+post_id;
-        }
+        //　wait NLP Processing time(2s)
+        setTimeout(function(){
+            if (xhr.status == 200) {
+                window.location.href = "/detail/"+post_id;
+            } else {
+                window.location.href = "/comment/"+post_id;
+            }
+        }, 2000);
     }
 }
 

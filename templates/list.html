@@ -6,7 +6,7 @@
 {% block content %}
 <div class="container mt-3">
     {% for item in object_list %}
-        {% if item.face_emotion == item.text_emotion %}<!--感情一致なら実行-->
+        {% if True or item.face_emotion == item.text_emotion %}<!--感情一致なら実行-->
         <div class="alert alert-success emotion-{{ item.face_emotion }}" role="alert">
             投稿者：{{item.user.username}}
             　文字感情：{% if item.text_emotion == "positive" %}🥰{% elif item.text_emotion == "negative" %}😥{% else %}😐{% endif %}
